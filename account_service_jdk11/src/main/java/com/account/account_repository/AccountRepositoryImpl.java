@@ -38,7 +38,35 @@ public class AccountRepositoryImpl extends BaseRepository implements AccountRepo
 		return accounts;// based on PK
 	}
 
-
 	
+	@Transactional
+	public Account getAccountById(long accountNumber) {
+		EntityManager entityManager = getEntityManager();
+		Account accounts = null;
+		try {
+			accounts = entityManager.find(Account.class, accountNumber);
+		} catch (Exception e) {
+
+		}
+
+		return accounts;// based on PK
+	}
+	
+	
+	@Transactional
+	public Account updateAccount(Account account) {
+		EntityManager entityManager = getEntityManager();
+		entityManager.merge(account);
+		return account;
+	}
+	
+	@Transactional
+	public void deleteAccount(Account account) {
+		EntityManager entityManager = getEntityManager();
+		entityManager.remove(account);
+		
+	}
+
+
 
 }

@@ -48,10 +48,21 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 
-	@Transactional
 	public Customer updateCustomerService(Customer customer) {
 		// TODO Auto-generated method stub
 		return customerRepo.updateCustomer(customer);
+	}
+
+
+	public boolean deleteCustomerService(int custId) {
+		
+		boolean deleted = false;
+		Customer customerToDelete = customerRepo.selectCustomerById(custId);
+		if(customerToDelete != null) {
+			customerRepo.deleteCustomer(customerToDelete);
+			deleted = true;
+		}
+		return deleted;
 	}
 
 

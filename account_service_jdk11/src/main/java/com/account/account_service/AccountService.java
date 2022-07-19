@@ -15,7 +15,11 @@ public interface AccountService {
 	
 	public Account saveAccountService(Account customer);
 	
+	public boolean deleteAccountByCustomerIdService(List<Account> accounts);
+	
+	public Account getAccountByIdService(long accountNo);
+	
+	public Account updateAccountService(Account account);
 	
 	
-
 }

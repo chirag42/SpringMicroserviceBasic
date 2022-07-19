@@ -16,6 +16,7 @@ public interface CustomerRepository {
 
 	public Customer updateCustomer(Customer customer);
 
+	public void deleteCustomer(Customer customer);
 	
 
 }

@@ -56,6 +56,13 @@ public class CustomerRepositoryImpl extends BaseRepository implements CustomerRe
 
 	}
 
+	@Transactional
+	public void deleteCustomer(Customer customer) {
+		
+		EntityManager entityManager = getEntityManager();
+		entityManager.remove(customer);
+	}
+
 	
 
 }

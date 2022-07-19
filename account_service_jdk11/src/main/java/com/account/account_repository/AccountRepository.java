@@ -13,8 +13,10 @@ public interface AccountRepository {
 
 	public Account saveAccount(Account account);
 
+	public void deleteAccount(Account account);
 	
-
+	public Account updateAccount(Account account);
 	
+	public Account getAccountById(long accountNumber);
 
 }

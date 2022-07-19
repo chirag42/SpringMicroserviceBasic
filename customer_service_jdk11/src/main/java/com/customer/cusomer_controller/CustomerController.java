@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,17 +30,17 @@ public class CustomerController {
 
 	@Autowired
 	private RestTemplate restTemplate;
-	
+
 	@GetMapping
 	@ResponseBody
 	@RequestMapping(value = "/getCust/{custId}")
 	public Customer getCustomer(@PathVariable int custId) {
 		System.out.println("getEmployee()...method ");
-		Customer customer=null;
+		Customer customer = null;
 		try {
 			List accounts = null;
 			customer = service.selectCustomerByIdService(custId); // FROM THE DB
-			accounts = this.restTemplate.getForObject("http://localhost:9002/account/getAccount/"+custId, List.class);
+			accounts = this.restTemplate.getForObject("http://localhost:9002/account/getAccount/" + custId, List.class);
 			customer.setBankAccounts(accounts);
 			return customer;
 		}
@@ -50,10 +51,10 @@ public class CustomerController {
 		catch (Exception e) {
 			System.out.println("Account Service under Maintainence");
 			return customer;
-			
+
 		}
-		
-		//return null;
+
+		// return null;
 	}
 
 	@PostMapping
@@ -83,25 +84,40 @@ public class CustomerController {
 
 	}
 
-	@GetMapping("/fetchEmail/{email}")
-	@ResponseBody
-	public Customer fetchByEmail(@PathVariable String email) {
-
-		/* String tempEmailId = customer.getCustEmail(); */
-		Customer customerObj = service.fetchCustomerByEmailIdService(email);
-
-		return customerObj;
-
-	}
-
 	@PutMapping("/updateCustomer")
-	public Customer updateCustomer(@RequestBody Customer customer) {
+	@ResponseBody
+	public String updateCustomer(@RequestBody Customer customer) {
+		String message = "Customer Not Found";
+		Customer customerUpdateObj = service.selectCustomerByIdService(customer.getCustId());
+		if (customerUpdateObj != null) {
+			service.updateCustomerService(customer);
+			message = "Customer Updated Successfully";
+		}
 
-		return service.updateCustomerService(customer);
+		return message;
 
 	}
 
-	
+	@DeleteMapping("/deleteCustomer/{custId}")
+	public String deleteCustomer(@PathVariable int custId) {
+		String message = "Customer Not Found";
+		boolean deleted = false;
+		Customer customerUpdateObj = service.selectCustomerByIdService(custId);
+		if (customerUpdateObj != null) {
+			try {
+				this.restTemplate.delete("http://localhost:9002/account/deleteCustomerAccount/" + custId);
+				deleted = service.deleteCustomerService(custId);
+				if (deleted == true) {
 
-	
+					message = "Customer Deleted Successfully.";
+				}
+			} catch (Exception e) {
+				return "Account Service under Maintainence. Make sure the account service is up in order to delete this Customer. "
+						+ "This is an example of Synchronous Communication between two Microservices. We can use Asynchronous communication between microservices "
+						+ "so that Account service downtime will not affect the Customer service. Async communication can be implemented using Messaging Queues.";
+			}
+		}
+		return message;
+	}
+
 }
