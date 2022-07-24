@@ -1,11 +1,15 @@
 package com.customer.cusomer_controller;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -97,6 +101,25 @@ public class CustomerController {
 		return message;
 
 	}
+	
+	@PatchMapping("/patchCustomer/{custId}")
+	@ResponseBody
+	public String patchCustomer(@PathVariable int custId, @RequestBody Map<Object, Object> patchFields) {
+		String message = "Customer Not Found";
+		Customer customerUpdateObj = service.selectCustomerByIdService(custId);
+		if (customerUpdateObj != null) {
+			patchFields.forEach((key ,value) -> {
+				Field patchFieldForCustomerObj = ReflectionUtils.findField(Customer.class, (String) key);
+				patchFieldForCustomerObj.setAccessible(true);
+				ReflectionUtils.setField(patchFieldForCustomerObj, customerUpdateObj, value);
+			});
+			service.updateCustomerService(customerUpdateObj);
+			message = "Customer Updated Successfully";
+		}
+		
+		return message;
+	}
+	
 
 	@DeleteMapping("/deleteCustomer/{custId}")
 	public String deleteCustomer(@PathVariable int custId) {
